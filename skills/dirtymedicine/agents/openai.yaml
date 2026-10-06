@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dirty Medicine 教学视频制作"
+  short_description: "借鉴 Dirty Medicine 教学法设计中文医学口播与分镜方案"
+  default_prompt: "请使用 $dirtymedicine 技能，为该主题创作口播与可执行分镜方案。"
