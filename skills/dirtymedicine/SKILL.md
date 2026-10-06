@@ -2,7 +2,7 @@
 name: dirtymedicine
 description: 借鉴 Dirty Medicine 教学法，制作因果清晰、画面逐步展开的中文医学口播/中英课程、图解、长课配音和病例教学。
 metadata:
-  version: "2.0"
+  version: "2.1"
   updated: "2026-10-07"
 ---
 
@@ -46,7 +46,7 @@ metadata:
 - 遇到易混点采用具体设问并紧跟即时解答。
 - 语速与留白根据认知负荷调整，避免公文腔。
 
-生成或改写记忆口诀时，单独咨询 agy，把真实 Dirty Medicine 口诀、对应知识点与已授权完整参考课稿一起放入 prompt，明确要求模仿其联想设计。读 [references/mnemonic-authoring.md](references/mnemonic-authoring.md)，不把普通机制总结当作已通过审核的口诀。
+生成或改写记忆口诀时，单独咨询 agy，把真实 Dirty Medicine 口诀、对应知识点与已授权完整参考课稿一起放入 prompt，明确要求模仿其联想设计。读 [references/mnemonic-authoring.md](references/mnemonic-authoring.md)，不把普通机制总结当作已通过审核的口诀。先明确要记的是名称、拼写还是配对；将候选交给独立匿名会话审查，再用实际音频与画面试讲核对，模型通过不等于用户认可或真人记忆效果。
 
 ### 第三步：设计画面逐步展开分镜
 参考 [references/video-production.md](references/video-production.md) 的分镜协议：
