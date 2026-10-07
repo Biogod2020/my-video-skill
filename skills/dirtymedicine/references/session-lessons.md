@@ -18,3 +18,5 @@
 - 本课删除 1.38 秒 PK 英文拼读片段，英文仍显示在图中；片尾增加 1.5 秒留白，最终视频 680.84 秒。
 
 原项目本地证据：`renders/g6pd-lesson/beginner-v2-20261007/` 下的 `audio-audit.json`、`video-validation.json`、`agy-review.json`、`release-manifest.json`；全文输入记录在 `projects/g6pd-gptimage-lesson/production/fulltext-guided-rewrite-20261006/reference-fulltexts.json`。这些运行记录与课程全文不随公开仓库打包。上述观察记录于 2026-10-07。
+
+- **2026-10-08 改稿教训**：用户反馈 G6PD 后半段初稿存在防御性、保守性和跳跃性。重新参考四份完整原课后组织的 10-15 页，成功消除了“针对本题线索”“明确一点”等审核语言，恢复了连续推导与顺畅转场。本次认可仅针对文字稿效果（记录在 `projects/g6pd-natural-caseflow-20261007/`，含原稿、新稿、微调与 provenance），不声称新视频已完成验收。
