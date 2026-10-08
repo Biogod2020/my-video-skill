@@ -2,7 +2,7 @@
 name: dirtymedicine
 description: 借鉴 Dirty Medicine 教学法，制作因果清晰、画面逐步展开的中文医学口播/中英课程、图解、长课配音和病例教学。
 metadata:
-  version: "2.4"
+  version: "2.5"
   updated: "2026-10-08"
 ---
 
@@ -58,5 +58,7 @@ metadata:
 ## 4. 长课制作与经验参考
 
 完整课程的全文参考、双语译写、GPT Image 图解、连续配音、停顿与实际 MP4 审核，按需读 [references/production-workflow.md](references/production-workflow.md)。本项目沿用用户认可的 MOSS 音色与原生节奏；模型选择以实际长稿比较为依据。
+
+长课连续原生生成、题前停顿校准与独立盲听审听的执行基线及参数规范，详见 [longform-voice.md](references/longform-voice.md)。
 
 需要本课运行记录与适用局限时，读 [references/session-lessons.md](references/session-lessons.md)。
