@@ -2,7 +2,7 @@
 name: dirtymedicine
 description: 借鉴 Dirty Medicine 教学法，制作因果清晰、画面逐步展开的中文医学口播/中英课程、图解、长课配音和病例教学。
 metadata:
-  version: "2.15"
+  version: "2.16"
   updated: "2026-10-14"
 ---
 
@@ -81,6 +81,6 @@ metadata:
 
 英文底模（MOSS-TTS-v1.5 8B base）原生生成基线、配音母带与稀疏剪辑留白派生规范，详见 [references/moss-native-baseline.md](references/moss-native-baseline.md)。
 
-音频时间轴提取与安全切点生成已迁移为确定性工程流水线。中文口播采用 Qwen ForcedAligner 实现逐字定位，英文保持全局 CTC 整轨对齐，并由 `scripts/build_text_audio_map.py` 与 `scripts/build_segment_edit_candidates.py` 基于波形静音和讲稿教学意图确定性输出候选切点（禁止大模型推测词秒）。完整工具命令、环境配置、数据规约及句段 ASR 剪辑规范详见 [references/audio-timeline.md](references/audio-timeline.md)。
+音频时间轴提取与教学留白补差已确立为全课程默认工程流水线（默认执行无需每课重复征询用户留白授权）。流程采用连续原生语音生成后冻结母带，中文通过 Qwen ForcedAligner 逐字定位，英文采用全局 CTC 整轨对齐（禁止大模型推测词秒）；随后由 agy 从完整课稿标注需消化的句末教学意图，由 `scripts/build_text_audio_map.py` 提取候选并由 `scripts/apply_course_timeline_pauses.py` 自动应用符合课程教学标注和严格波形静音规则的稀疏小补白，生成同一 sample EDL 重映射音频、字幕、画面与章节，并提供非补白段原 PCM 逐样本相等验证。默认无全局 atempo、无逐句 R3 时间拉伸、无逐逗号自动静音标准化；不在词内、主谓或未说出答案的引导句间切，已有停顿足够则自动跳过。派生新母带必须独立送交 Gemini 全量实听完整新音频与实看完整新 MP4，严禁向新 hash 移植旧审核通过状态。完整工具命令、环境配置、数据规约及句段 ASR 剪辑规范详见 [references/audio-timeline.md](references/audio-timeline.md)。
 
 需要 G6PD、果糖代谢与 B02 长音频（2026-10-11）运行记录、成片与音频验收状态及适用局限时，读 [references/session-lessons.md](references/session-lessons.md)。

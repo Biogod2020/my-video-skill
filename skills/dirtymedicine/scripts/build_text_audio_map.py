@@ -238,6 +238,11 @@ def build_boundaries(text, sections, units, policy):
         target = request.get("target_gap_seconds")
         if target is not None and (not math.isfinite(target) or target < 0):
             raise ValueError("Invalid target gap")
+        addition_limit = request.get("maximum_added_seconds")
+        if addition_limit is not None and (
+            not math.isfinite(addition_limit) or addition_limit <= 0
+        ):
+            raise ValueError("Invalid boundary-specific addition limit")
         semantic[index] = request
     return hints, semantic, protected, offsets, unresolved
 
@@ -321,6 +326,9 @@ def build_map(
                     "purpose": request.get("purpose", "") if request else "",
                     "existing_target_gap_s": target,
                     "additional_gap_budget_s": deficit,
+                    "maximum_added_seconds": request.get("maximum_added_seconds")
+                    if request
+                    else None,
                     "pause_state": pause_state,
                     "needs_semantic_review_before_edit": request is None,
                     "waveform": join,
