@@ -2,8 +2,8 @@
 name: dirtymedicine
 description: 借鉴 Dirty Medicine 教学法，制作因果清晰、画面逐步展开的中文医学口播/中英课程、图解、长课配音和病例教学。
 metadata:
-  version: "2.6"
-  updated: "2026-10-08"
+  version: "2.7"
+  updated: "2026-10-09"
 ---
 
 # Dirty Medicine 教学讲稿与视频制作
