@@ -78,3 +78,5 @@
 
 自然指图衔接、动作句与关键关系的改写，按需读 [spoken-examples.md](spoken-examples.md)。
 口诀创作单独调用 agy，按 [mnemonic-authoring.md](mnemonic-authoring.md) 执行。
+
+新写或重写整课时，配音前须完成 [learner-review.md](learner-review.md) 的独立学生复述与全部同语种前课逐段对照；写作和审核实际输入必须使用当前 skill 版本。
