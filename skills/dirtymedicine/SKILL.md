@@ -2,8 +2,8 @@
 name: dirtymedicine
 description: 借鉴 Dirty Medicine 教学法，制作因果清晰、画面逐步展开的中文医学口播/中英课程、图解、长课配音和病例教学。
 metadata:
-  version: "2.8"
-  updated: "2026-10-09"
+  version: "2.15"
+  updated: "2026-10-14"
 ---
 
 # Dirty Medicine 教学讲稿与视频制作
@@ -11,6 +11,9 @@ metadata:
 将复杂的医学机制、疾病鉴别与考试题解转化为因果清晰、画面逐步展开的教学视频讲稿与分镜方案。重点讲清问题动机、机制变化与做题排除，避免平铺直叙照读教材。
 
 需要参考完整口播文稿、分镜推进表或试题标注格式时，请阅读 [references/examples.md](references/examples.md)。
+
+> [!IMPORTANT]
+> **同语言统一语速与教学顿挫底线**：所有课程同语言统一实际口播发声速度与停顿区间标准，严禁在代码中硬编码固定倍速（如盲目设为 1.25x）；先测量扣除静音后的实测发声速度；已获认可且符合当前标准的原生轨保持原速，确有校准需要时再计算派生轨倍速，倍速不同不代表标准不同。节奏校准与局部语速突变筛查采用确定性工程算法，所有数值计算、波形校准与局部突变定位无需且严禁额外调用 Gemini 决策或预先批准；严禁将此类数值证据的确认或处理依赖于 Gemini 批准。局部突变筛查与复听规则详见 [references/local-pace.md](references/local-pace.md)。工程测速与突变筛查属于质量测量与待核复查线索，测量本身不等于必须破坏已获认可的 TTS 原生发声与自然停连轨；默认无全局 tempo、无逐句 R3 时间拉伸、无逐逗号自动静音标准化，测速候选不直接自动修。严格区分已获认可的 TTS 原生母带与经授权制作的可回滚剪辑派生母带（稀疏留白派生），制作、工程验证、Gemini 听审与用户接受分别记录；未执行的步骤不得标为完成。最终导出音频与视频仍必须全量送交 Gemini 实听实看进行自然度、发音与教学质检。必须严格区分**发声速度**、**句间认知留白**与**原声重音/韵律**三要素：停顿属于全篇正文教学结构而非仅限题前，静音切勿伪造缺失的重音；语速达标不能自动证明初学者听感通过。统一标准的候选数值由项目配置管理，新派生版本须独立审核，历史通过不移植。详细规则与交付放行标准见 [references/longform-voice.md 停顿与顿挫规范](references/longform-voice.md#3-停顿教学目的与自动校准) 及 [references/moss-native-baseline.md](references/moss-native-baseline.md)。
 
 ## 0. Gemini/agy 核心闭环与模型调用原则
 
@@ -20,11 +23,11 @@ metadata:
 2. **全文撰写、译写与整合**：完整讲稿、跨段转场、口诀回填、双语口语对齐与 visual cues 全部由 agy 撰写与整合；Codex 不得擅自撰写核心讲稿段落或强行插入自拟口诀。修改反馈须附带整课上下文送回 agy 处理受影响范围，并完整保留用户已认可内容。
 3. **记忆口诀（Hook）独立创作与盲审**：独立调用 agy 设计候选，prompt 须包含真实 Dirty Medicine 原课口诀结构与已授权完整参考稿；另开匿名 Gemini/agy 会话进行盲审。若第 1 步判定本主题可通过图解推导而无需口诀，写明理由即可，绝不为了“调用流程”强行造口诀。
 4. **分镜设计与图解提示词**：由 agy 负责讲稿对应的分镜规划、教学意图、GPT Image 提示词、空间方位、图像不变量与 cue；图像生成由 GPT Image 工具执行后，**Gemini/agy 必须直接接收实际生成的图像文件与对应台词**，审核科学拓扑、左右方位、可读性与教学作用。Codex 负责核验原生公式、文本标签、对象数量、图层布局与时间线接入。
-5. **长课配音与整轨音频听审**：由 MOSS-TTS 按冻结工程基线生成整课音频；**Gemini/agy 必须直接接收并完整听审生成的实际长音频**，检查自然度、连贯性、语速、医学专有名词发音以及首尾完整性，并明确引用开头、中段、后段和末尾的真实发声台词与时间戳。严禁仅给模型提供讲稿文本或截取短音频样本听审。音频独立听审须隔离模型身份、参考真声、字幕与旧评分。工程静音/ASR 自动化检查不可替代真实的 Gemini 听审。
+5. **长课配音与整轨音频听审**：由 MOSS-TTS 按冻结工程基线生成整课音频；**Gemini/agy 必须直接接收并完整听审生成的实际长音频**，检查自然度、连贯性、整体听觉节奏感、医学专有名词发音以及首尾完整性，并明确引用开头、中段、后段和末尾的真实发声台词与时间戳。严禁仅给模型提供讲稿文本或截取短音频样本听审。音频独立听审须隔离模型身份、参考真声、字幕与旧评分。局部数字语速突变、短窗对比与静音测速完全由工程脚本独立筛查（详见 [references/local-pace.md](references/local-pace.md)），明确禁止为数字语速突变、阈值比对或静音测速额外调用 Gemini，亦不得将此类数值证据的确认或处理依赖于 Gemini 批准；若 Gemini 听审偶然指出语速急促，应返回工程测量数据与人工上下文复听研判，不将 LLM 估算速度作为数值裁决。工程静音/ASR 自动化检查不可替代真实的 Gemini 整体听感听审。
 6. **成片多模态全面验收**：**Gemini/agy 必须直接接收实际导出的完整 MP4 视频**，以初学者本科生视角全面检查解释前置、线索与选项推理、音画空间同步、术语读音与显示、画面与短字幕排版、语音节奏与思考留白、片尾留白与截断。明确确认媒体附件回执与可读模态。证实的真实问题交回 agy 重新整合讲稿/分镜/提示词，Codex 执行重生成与重渲染；更正后重新送审实际新文件，核对交付文件 hash。真实帧与波形证据可反驳模型偶发的视觉或发音误判，严禁为了盲目迎合模型报告无休止重做。
 
 **分工边界与运行环境**：
-- 上述实质创作与多模态审核节点属于 Gemini/agy 核心职责。FFmpeg 剪辑、文件复制、ASR 运行、RMS 扫描与 hash 校验等确定性工程操作由 Codex 独立执行，无需每条 shell 命令额外询问模型；但 Codex 不得越俎代庖替代任何实质创作与真实听看审核节点。
+- 上述实质创作与多模态审核节点属于 Gemini/agy 核心职责。FFmpeg 剪辑、文件复制、ASR 运行、RMS 扫描、扣除静音发声速度计算、确定性节奏校准与局部语速突变筛查（详见 [references/local-pace.md](references/local-pace.md)）等工程操作由 Codex 独立执行，无需且严禁额外调用 Gemini 决策或预先批准；明确禁止为数字语速突变、阈值比对或静音测速额外调用 Gemini，亦不得将此类数值证据的确认或处理依赖于 Gemini 批准。但 Codex 不得越俎代庖替代任何实质创作与真实听看审核节点。
 - 本机调用 agy 前，必须在同一交互 shell 中先运行 `proxy`：`zsh -ic 'proxy; agy ...'`。模型采用用户选择的 `gemini-3.8-flash-high`（本项目 agy 服务标识，不声称所有 Gemini API 同名）；严禁擅自切换为 Pro 模型。代理与私有 loopback 服务须在端口与健康检查就绪后再发请求；若遇连接拒绝，进行有限重试并如实记录错误回执与响应，严禁将仅有连接拒绝记为实审通过，不盲目重启他人服务或改切模型。记录调用时分别登记 requested model 与实际 returned model（如请求 `gemini-3.8-flash-high` 返回 `gemini-3.8-flash-n`，按原样记录，不推测映射含义）。当服务暂时不可用时，如实记录受阻节点并推进不依赖模型的工程与证据准备，严禁谎称已调用或由 Codex 私自代替创作。
 - 遵循用户既有相同素材与用途的长期授权，不重复询问；用户未来有明确新指令时以新指令为准。
 
@@ -50,7 +53,7 @@ metadata:
 根据内容属性从 [references/teaching-patterns.md](references/teaching-patterns.md) 中选择匹配路径，并参考模式之间的自然承接。
 
 ### 第二步：撰写口播脚本
-按 [references/spoken-chinese.md](references/spoken-chinese.md) 撰写；需要跨段推进与具体改写对照时，读 [references/spoken-examples.md](references/spoken-examples.md)：
+中文讲稿按 [references/spoken-chinese.md](references/spoken-chinese.md) 撰写；英文讲稿以 B02 IMG 简化版为难度基准按 [references/spoken-english.md](references/spoken-english.md) 撰写，保持普通英语难度与短清因果，不降低 USMLE 深度与原题真实度；需要跨段推进与具体改写对照时，读 [references/spoken-examples.md](references/spoken-examples.md)：
 - 采用面向学生指图讲解的口吻，以动作串联生化转化。
 - 解释机制时，遇到易混点采用具体设问并紧跟即时解答；正式练习题则先完整读题与选项，分组解析线索并留足思考期。
 - 语速与留白根据认知负荷调整，避免公文腔与推销腔。
@@ -76,4 +79,8 @@ metadata:
 
 长课连续原生生成、题前停顿校准、片尾杂音 Guard 筛查与独立盲听审听的执行基线及参数规范，详见 [references/longform-voice.md](references/longform-voice.md)。
 
-需要 G6PD 课程与果糖代谢新课（2026-10-09）运行记录、成片验收与适用局限时，读 [references/session-lessons.md](references/session-lessons.md)。
+英文底模（MOSS-TTS-v1.5 8B base）原生生成基线、配音母带与稀疏剪辑留白派生规范，详见 [references/moss-native-baseline.md](references/moss-native-baseline.md)。
+
+音频时间轴提取与安全切点生成已迁移为确定性工程流水线。中文口播采用 Qwen ForcedAligner 实现逐字定位，英文保持全局 CTC 整轨对齐，并由 `scripts/build_text_audio_map.py` 与 `scripts/build_segment_edit_candidates.py` 基于波形静音和讲稿教学意图确定性输出候选切点（禁止大模型推测词秒）。完整工具命令、环境配置、数据规约及句段 ASR 剪辑规范详见 [references/audio-timeline.md](references/audio-timeline.md)。
+
+需要 G6PD、果糖代谢与 B02 长音频（2026-10-11）运行记录、成片与音频验收状态及适用局限时，读 [references/session-lessons.md](references/session-lessons.md)。
