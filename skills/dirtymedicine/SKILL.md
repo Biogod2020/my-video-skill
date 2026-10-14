@@ -2,7 +2,7 @@
 name: dirtymedicine
 description: 借鉴 Dirty Medicine 教学法，制作因果清晰、画面逐步展开的中文医学口播/中英课程、图解、长课配音和病例教学。
 metadata:
-  version: "2.7"
+  version: "2.8"
   updated: "2026-10-09"
 ---
 
@@ -25,7 +25,7 @@ metadata:
 
 **分工边界与运行环境**：
 - 上述实质创作与多模态审核节点属于 Gemini/agy 核心职责。FFmpeg 剪辑、文件复制、ASR 运行、RMS 扫描与 hash 校验等确定性工程操作由 Codex 独立执行，无需每条 shell 命令额外询问模型；但 Codex 不得越俎代庖替代任何实质创作与真实听看审核节点。
-- 本机调用 agy 前，必须在同一交互 shell 中先运行 `proxy`：`zsh -ic 'proxy; agy ...'`。模型采用用户选择的 `gemini-3.8-flash-high`（本项目 agy 服务标识，不声称所有 Gemini API 同名）；严禁擅自切换为 Pro 模型。当服务暂时不可用时，如实记录受阻节点并推进不依赖模型的工程与证据准备，严禁谎称已调用或由 Codex 私自代替创作。
+- 本机调用 agy 前，必须在同一交互 shell 中先运行 `proxy`：`zsh -ic 'proxy; agy ...'`。模型采用用户选择的 `gemini-3.8-flash-high`（本项目 agy 服务标识，不声称所有 Gemini API 同名）；严禁擅自切换为 Pro 模型。代理与私有 loopback 服务须在端口与健康检查就绪后再发请求；若遇连接拒绝，进行有限重试并如实记录错误回执与响应，严禁将仅有连接拒绝记为实审通过，不盲目重启他人服务或改切模型。记录调用时分别登记 requested model 与实际 returned model（如请求 `gemini-3.8-flash-high` 返回 `gemini-3.8-flash-n`，按原样记录，不推测映射含义）。当服务暂时不可用时，如实记录受阻节点并推进不依赖模型的工程与证据准备，严禁谎称已调用或由 Codex 私自代替创作。
 - 遵循用户既有相同素材与用途的长期授权，不重复询问；用户未来有明确新指令时以新指令为准。
 
 ## 1. 核心制作准则
@@ -76,4 +76,4 @@ metadata:
 
 长课连续原生生成、题前停顿校准、片尾杂音 Guard 筛查与独立盲听审听的执行基线及参数规范，详见 [references/longform-voice.md](references/longform-voice.md)。
 
-需要本课运行记录、2026-10-08 最终成片验收与适用局限时，读 [references/session-lessons.md](references/session-lessons.md)。
+需要 G6PD 课程与果糖代谢新课（2026-10-09）运行记录、成片验收与适用局限时，读 [references/session-lessons.md](references/session-lessons.md)。
