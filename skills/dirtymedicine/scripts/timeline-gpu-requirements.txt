@@ -1,0 +1,7 @@
+# Python 3.11; install in a separate CUDA runtime, not the Mac editing environment.
+torch==2.8.0
+torchaudio==2.8.0
+transformers==4.57.6
+qwen-asr @ git+https://github.com/QwenLM/Qwen3-ASR.git@7c6daf77a2421100f5fb066495372c00129d39ff
+numpy>=1.26,<3
+soundfile>=0.13,<1

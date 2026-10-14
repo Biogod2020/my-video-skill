@@ -1,0 +1,16 @@
+{
+  "id": "course-timeline-candidates-v1",
+  "backend_by_language": {"zh": "Qwen3-ForcedAligner-0.6B", "en": "global_ctc"},
+  "quiet_window_seconds": 0.02,
+  "quiet_hop_seconds": 0.01,
+  "phonetic_guard_seconds": 0.04,
+  "quiet_edge_guard_seconds": 0.02,
+  "quiet_rms_dbfs": -54,
+  "quiet_peak_dbfs": -44,
+  "minimum_quiet_run_seconds": 0.06,
+  "minimum_confidence": 0.65,
+  "join_max_pcm_units": 8,
+  "minimum_added_seconds": 0.08,
+  "boundaries": [],
+  "protected_phrases": []
+}
