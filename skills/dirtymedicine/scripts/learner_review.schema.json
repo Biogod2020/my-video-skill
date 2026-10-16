@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "common": {
+      "type": "object",
+      "required": [
+        "contract_version",
+        "language",
+        "draft_language_sha256",
+        "records",
+        "required_edits",
+        "optional_notes",
+        "verdict"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "learner-review/1"
+        },
+        "language": {
+          "enum": [
+            "zh-CN",
+            "en-US"
+          ]
+        },
+        "draft_language_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "records": {
+          "type": "array",
+          "minItems": 1
+        },
+        "required_edits": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "optional_notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "verdict": {
+          "enum": [
+            "pass",
+            "revise",
+            "uncertain",
+            "error"
+          ]
+        }
+      }
+    },
+    "novice": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "properties": {
+            "records": {
+              "items": {
+                "type": "object",
+                "required": [
+                  "chunk_id",
+                  "original_quote",
+                  "novice_paraphrase",
+                  "causal_chain",
+                  "cognitive_obstacles",
+                  "chunk_goal_understood",
+                  "context_check",
+                  "naturalness_check"
+                ],
+                "properties": {
+                  "chunk_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "original_quote": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "novice_paraphrase": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "causal_chain": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "cognitive_obstacles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "chunk_goal_understood": {
+                    "type": "boolean"
+                  },
+                  "prerequisites": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "chunk_id",
+                        "quote"
+                      ],
+                      "properties": {
+                        "chunk_id": {
+                          "type": "string"
+                        },
+                        "quote": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "context_check": {
+                    "type": "object",
+                    "required": [
+                      "checked",
+                      "dependencies",
+                      "no_dependencies_reason"
+                    ],
+                    "properties": {
+                      "checked": {
+                        "type": "boolean"
+                      },
+                      "dependencies": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "fact",
+                            "use_quote",
+                            "status",
+                            "source_chunk_id",
+                            "source_quote",
+                            "learner_question"
+                          ],
+                          "properties": {
+                            "fact": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "use_quote": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "status": {
+                              "enum": [
+                                "established_before",
+                                "introduced_here",
+                                "derived_here",
+                                "missing",
+                                "unclear"
+                              ]
+                            },
+                            "source_chunk_id": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "source_quote": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "learner_question": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        }
+                      },
+                      "no_dependencies_reason": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    }
+                  },
+                  "naturalness_check": {
+                    "type": "object",
+                    "required": [
+                      "spoken_aloud_problem",
+                      "ordinary_word_difficulty"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "spoken_aloud_problem": {
+                        "type": "string"
+                      },
+                      "ordinary_word_difficulty": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "comparison": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/common"
+        },
+        {
+          "properties": {
+            "records": {
+              "items": {
+                "type": "object",
+                "required": [
+                  "chunk_id",
+                  "original_quote",
+                  "paragraph_acceptable",
+                  "comparisons"
+                ],
+                "properties": {
+                  "chunk_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "original_quote": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "paragraph_acceptable": {
+                    "type": "boolean"
+                  },
+                  "comparisons": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "reference_key",
+                        "comparable",
+                        "observation",
+                        "required_change"
+                      ],
+                      "properties": {
+                        "reference_key": {
+                          "type": "string"
+                        },
+                        "comparable": {
+                          "type": "boolean"
+                        },
+                        "observation": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "required_change": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

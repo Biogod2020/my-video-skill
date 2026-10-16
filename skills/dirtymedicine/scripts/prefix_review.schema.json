@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SequentialComprehensionProbeResult",
+  "description": "Standard output schema for sequential comprehension and first-dependency audit probe in medical education QA.",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Echo of the input case or checkpoint identifier."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "revise",
+        "uncertain"
+      ],
+      "description": "Audit judgment for the current prefix checkpoint based strictly on provided material."
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Granular atomic prerequisite dependencies evaluated at this focus point. Can be empty if no distinct dependencies are invoked.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "fact": {
+            "type": "string",
+            "description": "Description of the atomic prerequisite fact, concept, or patient observation."
+          },
+          "use_quote": {
+            "type": "string",
+            "description": "Exact verbatim quote where this fact is first relied upon or presumed known."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "established_before",
+              "introduced_here",
+              "derived_here",
+              "missing",
+              "unclear"
+            ],
+            "description": "Epistemic status of the dependency at its earliest point of reliance."
+          },
+          "source_chunk_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Identifier of the prefix chunk establishing this fact, or null if missing or derived without a dedicated prior chunk."
+          },
+          "source_quote": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Exact continuous verbatim quote establishing the fact, or null if missing."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Detailed rationale explaining why this status was assigned, based strictly on the provided prefix."
+          },
+          "learner_question": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Natural cognitive confusion question that a novice learner would raise if this dependency is missing or unclear; null if established, introduced, or derived."
+          }
+        },
+        "required": [
+          "fact",
+          "use_quote",
+          "status",
+          "source_chunk_id",
+          "source_quote",
+          "reason",
+          "learner_question"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "teach_back": {
+      "type": "string",
+      "description": "Plain-language novice retelling of who does what to whom and why the next step occurs, preserving essential terms without expert compensatory additions."
+    },
+    "negative_control": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "description": "Evaluation for negative control tasks. Must be populated if task_kind is negative_control, otherwise null.",
+      "properties": {
+        "answerable_from_material": {
+          "type": "boolean",
+          "description": "Whether the target question can be legitimately answered solely using the provided prefix material."
+        },
+        "answer": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Answer derived strictly from the text, or null if unanswerable from the material."
+        },
+        "source_quote": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Exact continuous quote supporting the answer, or null if unanswerable from the material."
+        }
+      },
+      "required": [
+        "answerable_from_material",
+        "answer",
+        "source_quote"
+      ],
+      "additionalProperties": false
+    },
+    "required_edits": {
+      "type": "array",
+      "description": "List of concrete, necessary modifications required to resolve genuine epistemic gaps blocking comprehension. Empty if verdict is pass.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "optional_notes": {
+      "type": "array",
+      "description": "Non-blocking stylistic observations, instructional pacing notes, or minor phrasing suggestions that do not impede comprehension.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "limits": {
+      "type": "array",
+      "description": "Explicit epistemological boundary declarations regarding prefix cutoff, evidence limitations, unrendered visual states, or perspective limits.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "case_id",
+    "verdict",
+    "dependencies",
+    "teach_back",
+    "negative_control",
+    "required_edits",
+    "optional_notes",
+    "limits"
+  ],
+  "additionalProperties": false
+}

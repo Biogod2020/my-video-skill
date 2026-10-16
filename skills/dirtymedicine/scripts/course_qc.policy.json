@@ -1,0 +1,652 @@
+{
+  "schema_version": "course-qc-policy/1",
+  "targets": {
+    "script-review": [
+      "author",
+      "medical",
+      "learner",
+      "comparison",
+      "prefix",
+      "calibration",
+      "source_audit"
+    ],
+    "private-video-review": [
+      "author",
+      "medical",
+      "learner",
+      "comparison",
+      "prefix",
+      "calibration",
+      "source_audit",
+      "voice_recipe",
+      "audio_engineering",
+      "audio_review",
+      "captions",
+      "visual_engineering",
+      "video_engineering",
+      "video_review"
+    ],
+    "publish": [
+      "author",
+      "medical",
+      "learner",
+      "comparison",
+      "prefix",
+      "calibration",
+      "source_audit",
+      "voice_recipe",
+      "audio_engineering",
+      "audio_review",
+      "captions",
+      "visual_engineering",
+      "video_engineering",
+      "video_review",
+      "publication_metadata"
+    ]
+  },
+  "checks": {
+    "author": {
+      "gate": "text",
+      "required_artifacts": [
+        "draft",
+        "tts_input"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "author_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/draft_language_sha256",
+          "artifact": "draft",
+          "mode": "draft_language"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    },
+    "medical": {
+      "gate": "text",
+      "required_artifacts": [
+        "draft"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/verdict",
+          "equals": "pass"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/core_science_acceptable",
+          "equals": true
+        },
+        {
+          "evidence": "result",
+          "pointer": "/required_edits",
+          "equals": []
+        }
+      ],
+      "reviewer_kind": "model",
+      "required_policies": [
+        "medical_scope"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/draft_language_hashes/{language}",
+          "artifact": "draft",
+          "mode": "draft_language"
+        }
+      ]
+    },
+    "learner": {
+      "gate": "text",
+      "required_artifacts": [
+        "draft"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/text_gate_ready",
+          "equals": true
+        },
+        {
+          "evidence": "result",
+          "pointer": "/evidence_contract_valid",
+          "equals": true
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "learner_rules",
+        "full_learner_protocol"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/draft_language_sha256",
+          "artifact": "draft",
+          "mode": "draft_language"
+        }
+      ],
+      "literal_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/language",
+          "manifest_key": "language"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/schema_sha256"
+        }
+      ]
+    },
+    "comparison": {
+      "gate": "text",
+      "required_artifacts": [
+        "draft"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/text_gate_ready",
+          "equals": true
+        },
+        {
+          "evidence": "result",
+          "pointer": "/review_verdicts/comparison",
+          "equals": "pass"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "learner_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/draft_language_sha256",
+          "artifact": "draft",
+          "mode": "draft_language"
+        }
+      ],
+      "literal_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/language",
+          "manifest_key": "language"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/schema_sha256"
+        }
+      ]
+    },
+    "prefix": {
+      "gate": "text",
+      "required_artifacts": [
+        "draft"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/future_content_in_probe_inputs",
+          "equals": false
+        },
+        {
+          "evidence": "result",
+          "pointer": "/unresolved",
+          "equals": []
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "reviewer_protocol"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/draft_language_sha256",
+          "artifact": "draft",
+          "mode": "draft_language"
+        }
+      ],
+      "literal_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/language",
+          "manifest_key": "language"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    },
+    "calibration": {
+      "gate": "text",
+      "required_artifacts": [
+        "reviewer_protocol"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/scope",
+          "equals": "limited_assisted_use"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/labels_provided_to_model",
+          "equals": false
+        },
+        {
+          "evidence": "result",
+          "pointer": "/raw_model_failures_retained",
+          "equals": true
+        },
+        {
+          "evidence": "result",
+          "pointer": "/source_adjudication_required",
+          "equals": true
+        },
+        {
+          "evidence": "result",
+          "pointer": "/known_failure_controls_verified",
+          "equals": true
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "reviewer_protocol"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/reviewer_protocol_sha256",
+          "artifact": "reviewer_protocol"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    },
+    "voice_recipe": {
+      "gate": "audio",
+      "required_artifacts": [
+        "tts_input",
+        "voice_recipe",
+        "audio"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "voice_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/tts_input_sha256",
+          "artifact": "tts_input"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    },
+    "audio_engineering": {
+      "gate": "audio",
+      "required_artifacts": [
+        "audio",
+        "alignment",
+        "tts_input"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/unresolved",
+          "equals": []
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "pace_rules",
+        "voice_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/audio_sha256",
+          "artifact": "audio"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    },
+    "audio_review": {
+      "gate": "audio",
+      "required_artifacts": [
+        "audio"
+      ],
+      "full_media_artifact": "audio",
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/verdict",
+          "equals": "PASS"
+        },
+        {
+          "evidence": "proof",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "model",
+      "required_policies": [
+        "voice_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/input_media_sha256",
+          "artifact": "audio"
+        }
+      ]
+    },
+    "captions": {
+      "gate": "video",
+      "required_artifacts": [
+        "audio",
+        "alignment",
+        "caption_plan",
+        "captions"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "caption_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/audio_sha256",
+          "artifact": "audio"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/algorithm_sha256"
+        }
+      ]
+    },
+    "visual_engineering": {
+      "gate": "video",
+      "required_artifacts": [
+        "visual_plan",
+        "video"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "visual_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/video_sha256",
+          "artifact": "video"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    },
+    "video_engineering": {
+      "gate": "video",
+      "required_artifacts": [
+        "audio",
+        "captions",
+        "video"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "visual_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/video_sha256",
+          "artifact": "video"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    },
+    "video_review": {
+      "gate": "video",
+      "required_artifacts": [
+        "video"
+      ],
+      "full_media_artifact": "video",
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/verdict",
+          "equals": "PASS"
+        },
+        {
+          "evidence": "proof",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "model",
+      "required_policies": [
+        "visual_rules",
+        "context_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/input_media_sha256",
+          "artifact": "video"
+        }
+      ]
+    },
+    "publication_metadata": {
+      "gate": "publish",
+      "required_artifacts": [
+        "video",
+        "publication_metadata"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "branding_rules"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/video_sha256",
+          "artifact": "video"
+        }
+      ]
+    },
+    "source_audit": {
+      "gate": "text",
+      "required_artifacts": [
+        "draft"
+      ],
+      "conditions": [
+        {
+          "evidence": "result",
+          "pointer": "/state",
+          "equals": "passed"
+        },
+        {
+          "evidence": "result",
+          "pointer": "/independent_audit_completed",
+          "equals": true
+        },
+        {
+          "evidence": "result",
+          "pointer": "/all_items_audited",
+          "equals": true
+        },
+        {
+          "evidence": "result",
+          "pointer": "/unresolved",
+          "equals": []
+        },
+        {
+          "evidence": "result",
+          "pointer": "/audit_scope",
+          "equals": "production"
+        }
+      ],
+      "reviewer_kind": "engineering",
+      "required_policies": [
+        "reviewer_protocol"
+      ],
+      "result_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/draft_language_sha256",
+          "artifact": "draft",
+          "mode": "draft_language"
+        }
+      ],
+      "literal_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/language",
+          "manifest_key": "language"
+        }
+      ],
+      "result_tool_identity": [
+        {
+          "evidence": "result",
+          "pointer": "/checker_sha256"
+        }
+      ]
+    }
+  },
+  "artifact_dependencies": {
+    "tts_input": [
+      "draft"
+    ],
+    "audio": [
+      "tts_input",
+      "voice_recipe"
+    ],
+    "alignment": [
+      "audio"
+    ],
+    "caption_plan": [
+      "draft"
+    ],
+    "captions": [
+      "audio",
+      "alignment",
+      "caption_plan"
+    ],
+    "visual_plan": [
+      "draft"
+    ],
+    "video": [
+      "audio",
+      "captions",
+      "visual_plan"
+    ]
+  }
+}
