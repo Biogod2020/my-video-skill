@@ -2,8 +2,8 @@
 name: dirtymedicine
 description: 借鉴 Dirty Medicine 教学法，制作因果清晰、画面逐步展开的中文医学口播/中英课程、图解、长课配音和病例教学。
 metadata:
-  version: "2.23"
-  updated: "2026-10-16"
+  version: "2.26"
+  updated: "2026-10-22"
 ---
 
 # Dirty Medicine 教学讲稿与视频制作
@@ -22,7 +22,7 @@ metadata:
 **本项目由 Gemini/agy 贯穿整条教学创作与多模态审核闭环**。所有实质教学创作与质量把关节点必须实际调用 Gemini/agy，严禁仅将其当作最终成片的“离线盖章工具”，更严禁由 Codex 主观代写替代模型输出：
 
 1. **选题与教学设计**：必须由 agy 读取已授权的完整 BnB 与 Dirty Medicine 参考课稿、教材、用户目标与事实底稿，分析初学者前置知识、设计教学主线、提炼易混点并规划记忆目标。Codex 负责提供材料并核验完整性；局部任务仅调用受影响节点，不擅自扩写整课。
-2. **全文撰写、译写与整合**：完整讲稿、跨段转场、口诀回填、双语口语对齐与 visual cues 全部由 agy 撰写与整合；Codex 不得擅自撰写核心讲稿段落或强行插入自拟口诀。修改反馈须附带整课上下文送回 agy 处理受影响范围，并完整保留用户已认可内容。Codex 负责核验输出完整性（详见 [references/author-output-integrity.md](references/author-output-integrity.md)）：私下保留原始响应 envelope，解析当前最终 response JSON 并经独立 JSON Schema 校验，比对 final response 与 structured_output 并记录来源判决与版本哈希；严禁盲目优先旧 tool payload/structured_output，final 无效、缺字段或多份冲突 JSON 立即阻止，不得静默回退；受影响的审核与口播输入必须重算版本身份，不向新哈希移植旧 PASS。
+2. **全文撰写、译写与整合**：讲稿撰写、跨段转场、口诀回填、双语口语对齐与 visual cues 默认由 agy 撰写与整合；当用户明确指定 dsh 等其他作者或模型组合时尊重其选择，如实记录 author 与 integrator 身份，不把单次试验立为强制多模型流。无论由谁起草，全文整合必须读取完整当前稿与必要事实底稿，统一理顺开篇动机与主转场（详见 [references/narrative-flow.md](references/narrative-flow.md)），不把局部单句修饰替代全局整合，亦不得借整合之名超范围重写；Codex 不得擅自代写讲稿或强插自拟口诀。修改反馈须附带整课上下文处理受影响范围，并完整保留用户已认可内容。Codex 负责核验输出完整性（详见 [references/author-output-integrity.md](references/author-output-integrity.md)）：私下保留原始响应 envelope，解析当前最终 response JSON 并经独立 JSON Schema 校验，比对 final response 与 structured_output 并记录来源判决与版本哈希；严禁盲目优先旧 tool payload/structured_output，final 无效、缺字段或多份冲突 JSON 立即阻止，不得静默回退；受影响的审核与口播输入必须重算版本身份，不向新哈希移植旧 PASS。
 3. **记忆口诀（Hook）独立创作与盲审**：独立调用 agy 设计候选，prompt 须包含真实 Dirty Medicine 原课口诀结构与已授权完整参考稿；另开匿名 Gemini/agy 会话进行盲审。若第 1 步判定本主题可通过图解推导而无需口诀，写明理由即可，绝不为了“调用流程”强行造口诀。
 4. **分镜设计与图解提示词**：由 agy 负责讲稿对应的分镜规划、教学意图、GPT Image 提示词、空间方位、图像不变量与 cue；图像生成由 GPT Image 工具执行后，**Gemini/agy 必须直接接收实际生成的图像文件与对应台词**，审核科学拓扑、左右方位、可读性与教学作用。Codex 负责核验原生公式、文本标签、对象数量、图层布局与时间线接入。
 5. **长课配音与整轨音频听审**：由 MOSS-TTS 按冻结工程基线生成整课音频；**Gemini/agy 必须直接接收并完整听审生成的实际长音频**，检查自然度、连贯性、整体听觉节奏感、医学专有名词发音以及首尾完整性，并明确引用开头、中段、后段和末尾的真实发声台词与时间戳。严禁仅给模型提供讲稿文本或截取短音频样本听审。音频独立听审须隔离模型身份、参考真声、字幕与旧评分。局部数字语速突变、短窗对比与静音测速完全由工程脚本独立筛查（详见 [references/local-pace.md](references/local-pace.md)），明确禁止为数字语速突变、阈值比对或静音测速额外调用 Gemini，亦不得将此类数值证据的确认或处理依赖于 Gemini 批准；若 Gemini 听审偶然指出语速急促，应返回工程测量数据与人工上下文复听研判，不将 LLM 估算速度作为数值裁决。工程静音/ASR 自动化检查不可替代真实的 Gemini 整体听感听审。
@@ -33,11 +33,14 @@ metadata:
 - 本机调用 agy 前，必须在同一交互 shell 中先运行 `proxy`：`zsh -ic 'proxy; agy ...'`。模型采用用户选择的 `gemini-3.8-flash-high`（本项目 agy 服务标识，不声称所有 Gemini API 同名）；严禁擅自切换为 Pro 模型。代理与私有 loopback 服务须在端口与健康检查就绪后再发请求；若遇连接拒绝，进行有限重试并如实记录错误回执与响应，严禁将仅有连接拒绝记为实审通过，不盲目重启他人服务或改切模型。记录调用时分别登记 requested model 与实际 returned model（如请求 `gemini-3.8-flash-high` 返回 `gemini-3.8-flash-n`，按原样记录，不推测映射含义）。当服务暂时不可用时，如实记录受阻节点并推进不依赖模型的工程与证据准备，严禁谎称已调用或由 Codex 私自代替创作。
 - 遵循用户既有相同素材与用途的长期授权，不重复询问；用户未来有明确新指令时以新指令为准。
 
-有效版本与讲稿教学验收关卡：每次执行前必须实时核验当前 SKILL 及 references 的最新生效版本与哈希，严禁让历史 dossier 中的旧版本快照覆盖当前规则；发现版本冲突必须先更新实际输入。新写或重写讲稿先做教学组织与范围拆分（不锁死 14 页或教材顺序）；全文写就后必须经受【独立会话初学者复述审核】与【同语种全库已获认可课稿逐段对照】双重验收。初学者角色评估每段目标是否理解并指出具体卡点（不拿后文替补前文，不强制挑刺，不伪称真实学生试验），严格执行顺序上下文依赖审核（详见 [references/context-continuity.md](references/context-continuity.md)），医学事实另行独立核查。逐段对照必须覆盖当前登记的全部同语种前课并摘录原话证据。中文允许自然幽默与恰当生活梗，拒绝教材腔与无助理解的硬造谐音；自拟练习题可优化叙事但严保选项科学性与唯一正解。模型 PASS 仅为参考；用户要求“先审稿”时，通过后立即停步呈交文稿，严禁擅自启动配音与视频渲染。 具体输入、复述字段与逐段证据要求见 [references/learner-review.md](references/learner-review.md)。
+有效版本与讲稿教学验收关卡：每次执行前必须实时核验当前 SKILL 及 references 的最新生效版本与哈希，严禁让历史 dossier 中的旧版本快照覆盖当前规则；发现版本冲突必须先更新实际输入。新写或重写讲稿先做教学组织与范围拆分（不锁死 14 页或教材顺序），并在起草与改稿前冻结核心教学问题清单与因果闭环要求（详见 [references/learning-closure.md](references/learning-closure.md)）；全文写就后必须经受【独立会话初学者复述审核】、【学习闭环工程与语义复核】与【同语种全库已获认可课稿逐段对照】验收。初学者角色评估每段目标是否理解并指出具体卡点（不拿后文替补前文，不强制挑刺，不伪称真实学生试验），严格执行顺序上下文依赖审核（详见 [references/context-continuity.md](references/context-continuity.md)），医学事实另行独立核查。逐段对照必须覆盖当前登记的全部同语种前课并摘录原话证据。中文允许自然幽默与恰当生活梗，拒绝教材腔与无助理解的硬造谐音；自拟练习题可优化叙事但严保选项科学性与唯一正解。模型 PASS 仅为参考；用户要求“先审稿”时，通过后立即停步呈交文稿，严禁擅自启动配音与视频渲染。 具体输入、复述字段与逐段证据要求见 [references/learner-review.md](references/learner-review.md)。
+
+### 批量生产与定标质检扩展
+对于基于 DSH 进行批量化中英双语讲稿生产的场景，应遵循 [references/batch-authoring.md](references/batch-authoring.md) 的工程规范。写作前先冻结三级范围契约（核心/支持/可选），依据同语音实测语速生成 10–12 分钟字数预算（严禁给 TTS 施加时长约束或全局变速）。全流程引入 20 条固定验收项（覆盖八大教学维度，细分阻断与非阻断属性），结合逐字原文证据与最多 2 轮独立会话返修控制器，将合格候选讲稿交接至既有 `course_qc.py script-review` 门禁体系，只把未决异常交回人工处理；高分不能抵消医学硬伤。
 
 ## 1. 核心制作准则
 
-- **建立问题或学习动机**：在展开生化机制或临床推演前，先建立该主题的核心问题或生理生存动机（机制课先讲潜在威胁与生存刚需，临床课先讲鉴别难点），再顺理成章交代反应动作、催化流程与失效后果。详细语调规则见 [references/spoken-chinese.md](references/spoken-chinese.md)。
+- **建立问题或学习动机与自然叙事**：在展开生化机制或临床推演前，先建立该主题的核心问题或生理生存动机，从已有认知平稳过渡到当前矛盾，避免目录式报菜名或强制突袭病例；跨段转场说明为何此刻需要下一部分，杜绝暴露作者备课提纲的报幕式套话。详见 [references/narrative-flow.md](references/narrative-flow.md) 与 [references/spoken-chinese.md](references/spoken-chinese.md)。
 - **术语紧跟动作**：保留规范的医学专名、酶名与生化指标；专名出现后立即说明其催化、转化、转运或清除动作，不把多个生涩名词挤在同一句话中。
 - **初学者解题工具前置**：在需要推理之前，先分组解释化验指标含义或药物基本用途；做题先给足思考期，答案解析不机械复读所有数据。
 - **自然重述关键关系**：讲完复杂的转化机制后，用规范术语自然总结一次核心因果；随后在表格或题解中再次调用，加深印象。

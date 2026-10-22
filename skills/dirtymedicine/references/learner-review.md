@@ -41,7 +41,7 @@
 
 新建独立 Gemini 会话执行复述审核，不与写稿或主控会话混用上下文：
 
-1. **角色定义**：普通医学本科生 / USMLE 初学者（英文任务为 IMG 初学者）。具备基础生物学常识，但未掌握本课高级机制，对未铺垫的跳跃和教材腔极为敏感。
+1. **角色定义与双重视角**：普通医学本科生 / USMLE 初学者（英文任务为 IMG 初学者）。具备基础生物学常识，但未掌握本课高级机制。审稿人在段落分析前**先连读完整口播文本**，将“局部机制可懂性”与“全文叙事连贯度”分开审视（参见 [narrative-flow.md](narrative-flow.md)）：既查单步因果是否交代完整，也查开头动机是否自然、主转场是否生硬报幕。
 2. **顺向认知与禁前置借调**：评估任一教学语义段时，仅允许调动该段文字及此前已讲过的铺垫内容。严禁以后文即将解释的内容替前文脱罪；严禁引入稿外专家背景；严禁伪称进行了真实学生人群试验。绝不能用“引用科学术语复述得出”代替授课自然度。
 3. **逐段输出字段要求**：
    - `chunk_id` 与 `original_quote`：原稿位置及精确原文。
@@ -71,6 +71,7 @@
    - [ ] 讲稿输出完整性通过工程独立校验（解析最终 response JSON，Schema 校验放行，比对 structured_output 记录版本 hash 与来源，无缺失或冲突，详见 [author-output-integrity.md](author-output-integrity.md)）。
    - [ ] 所有语义段均完成初学者复述，无逻辑悬空。
    - [ ] 逐段 `context_check` 全部通过工程门禁与语义审核，无未铺垫的病例线索、术语或指代脱节（详见 [context-continuity.md](context-continuity.md)）。
+   - [ ] 学习闭环核验（learning closure check）通过：基于提前冻结的教学问题清单，逐题通过因果闭环审核，无悬空缺口（verdict 为 pass 且 required_edits 为空，详见 [learning-closure.md](learning-closure.md)）。
    - [ ] 完成与登记清单内同语种全部已获认可课程的逐段功能对照，证据确凿。
    - [ ] 独立医学事实核查通过。
    - [ ] **用户审稿把关点**：用户明确要求“先审稿”时，双重验收通过后**立即停止并呈交中英文完整稿件给用户**，严禁擅自提前启动 MOSS 配音合成、ASR 对齐、分镜生图或视频渲染。
@@ -117,12 +118,12 @@ novice.json 与 comparison.json 均必须实现 learner-review/1 根契约标准
 1. chunk_id 与 original_quote: 目标段唯一标识及逐字原稿引文。
 2. novice_paraphrase: 初学者白话机制转述（谁对谁做什么、下一步因何发生）。
 3. causal_chain: 提取的严密动词因果链条（字符串数组）。
-4. cognitive_obstacles: 识别出的绕口句式、教材公文腔或无推进重复（数组）。
+4. cognitive_obstacles: 识别出的绕口句式、教材公文腔、无推进重复、或暴露教案结构的生硬转场（数组）。
 5. chunk_goal_understood: 布尔值，当前段教学目标是否被顺畅理解。
 6. naturalness_check（口语自然度门禁）：
    固定对象结构：{'spoken_aloud_problem': string, 'ordinary_word_difficulty': string}。
    > [!IMPORTANT]
-   > **非空即阻断规则**：此处的字符串设计为阻断性缺陷指示器。任一字段非空都会触发机械拒放。必须先区分模型报告格式错误与有证据的真实内容缺陷；例如误填“无问题”属于响应格式错误，不得据此判口播有缺陷或改讲稿。若本段朗读顺畅、无生僻词理解障碍，**必须填为空字符串 ''**。严禁填写 '无问题'、'无' 或任何说明文字。
+   > **非空即阻断规则**：此处的字符串设计为阻断性缺陷指示器。任一字段非空都会触发机械拒放。必须先区分模型报告格式错误与有证据的真实内容缺陷；例如误填“无问题”属于响应格式错误，不得据此判口播有缺陷或改讲稿。若段落开头或转场存在严重影响听课体验的生硬割裂、且有确切相邻原话证据，写入 `spoken_aloud_problem` 并附带确切修改进 `required_edits`；若仅为可选措辞风格建议，必须放入 `optional_notes`，严禁填入阻断字段。若本段朗读顺畅、无生僻词理解障碍，**必须填为空字符串 ''**。严禁填写 '无问题'、'无' 或任何说明文字。
 7. context_check（上下文依赖门禁）：
    固定对象结构：{'checked': true, 'dependencies': [...], 'no_dependencies_reason': string | null}。
    - dependencies 记录当前段向前引用的前提事实。
@@ -156,3 +157,15 @@ novice.json 与 comparison.json 均必须实现 learner-review/1 根契约标准
 
 - **哈希多维绑定**：质检报告必须同时锁定并核验 checker_sha256（校验脚本哈希）与 schema_sha256（数据模式哈希）。任何脚本或 Schema 变更均使旧凭证失效，严禁使用新 wrapper 包装旧结果伪造通过。
 - **放行边界**：工程校验通过仅生成 text_gate_ready: true，绝对不等于用户已验收（user_accepted）。任何讲稿字面修改均导致 draft_language_sha256 失效，必须重走对应 DAG 节点重新计算状态。
+
+### 6.7 学习闭环核验接口与校验契约 (scripts/check_learning_closure.py)
+
+讲稿初学者因果闭环审核由统一工程脚本进行覆盖与一致性核验：
+
+```bash
+python scripts/check_learning_closure.py --draft draft.json --language zh-CN --plan plan.json --review closure.json --out closure-check.json
+```
+
+- **数据契约规范**：以相邻 `scripts/learning_closure.schema.json` 为实际字段与枚举定义。`learning-closure-plan/1` 采用 `contract_version`、`language`、`goals`（`id`、`question`、`kind`、`introduced_at`、`resolution_by`、`importance_reason`）与 `paired_units`；`learning-closure-review/1` 采用 `answers`（`goal_id`、`status`、`answer`、`source_refs`、`missing_link`、`reason`），引用键为 `paragraph_id` 与 `quote`。
+- **校验原则**：代码仅核验版本一致性、引文覆盖与无未决阻断项，因果语义蕴含仍须逐项独立核实；`closure-check.json` 直接作为 script-review 中 learner 检查的组成凭证。
+

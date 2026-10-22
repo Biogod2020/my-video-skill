@@ -12,7 +12,7 @@
   - *After (场景因果)*: "To remember this easily, think about an overnight fast where someone goes about twelve hours without food. As liver glycogen stores drop, gluconeogenesis must step in and provide a larger share of glucose."
 
 ## 2. 句式结构与教学因果
-- **动作与因果推进**：优先采用常用口语动词、短而完整的单句，一步交代一个生化反应或临床动作。保证主谓指代清晰、前后因果明确。
+- **动作与因果推进**：优先采用常用口语动词、短而完整的单句，一步交代一个生化反应或临床动作。保证主谓指代清晰、前后因果明确。段际衔接与开篇叙事逻辑对齐共享规范 [narrative-flow.md](narrative-flow.md)，避免机械的提纲报幕词（如频繁使用 "Next, let us..."）。
 - **教学深度不妥协**：严禁为了追求“简短”而删减核心机制推导或降低 USMLE 知识深度。允许自然完整的复合从句，不硬性设置每句单词上限；严禁为了缩短而切碎句子、机械堆叠设问、或在每个逗号处机械插入停顿。
 
 ## 3. 医学专名与试题保护

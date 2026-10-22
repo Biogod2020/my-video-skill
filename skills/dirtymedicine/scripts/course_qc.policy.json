@@ -115,7 +115,8 @@
     "learner": {
       "gate": "text",
       "required_artifacts": [
-        "draft"
+        "draft",
+        "learning_plan"
       ],
       "conditions": [
         {
@@ -127,12 +128,23 @@
           "evidence": "result",
           "pointer": "/evidence_contract_valid",
           "equals": true
+        },
+        {
+          "evidence": "closure",
+          "pointer": "/ready_for_script_review",
+          "equals": true
+        },
+        {
+          "evidence": "closure",
+          "pointer": "/evidence_contract_valid",
+          "equals": true
         }
       ],
       "reviewer_kind": "engineering",
       "required_policies": [
         "learner_rules",
-        "full_learner_protocol"
+        "full_learner_protocol",
+        "closure_rules"
       ],
       "result_identity": [
         {
@@ -140,11 +152,27 @@
           "pointer": "/draft_language_sha256",
           "artifact": "draft",
           "mode": "draft_language"
+        },
+        {
+          "evidence": "closure",
+          "pointer": "/draft_language_sha256",
+          "artifact": "draft",
+          "mode": "draft_language"
+        },
+        {
+          "evidence": "closure",
+          "pointer": "/plan_file_sha256",
+          "artifact": "learning_plan"
         }
       ],
       "literal_identity": [
         {
           "evidence": "result",
+          "pointer": "/language",
+          "manifest_key": "language"
+        },
+        {
+          "evidence": "closure",
           "pointer": "/language",
           "manifest_key": "language"
         }
@@ -156,6 +184,14 @@
         },
         {
           "evidence": "result",
+          "pointer": "/schema_sha256"
+        },
+        {
+          "evidence": "closure",
+          "pointer": "/checker_sha256"
+        },
+        {
+          "evidence": "closure",
           "pointer": "/schema_sha256"
         }
       ]

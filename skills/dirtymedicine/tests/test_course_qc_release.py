@@ -136,6 +136,22 @@ class ReleaseTests(unittest.TestCase):
         fn(body)
         self.m["checks"][key] = put(path, body)
 
+    def test_missing_learning_closure_blocks_release(self):
+        def remove_closure(receipt):
+            receipt["evidence"].pop("closure")
+
+        self.alter_receipt("learner", remove_closure)
+        report = self.run_release()
+        self.assertNotEqual(report["checks"]["learner"]["status"], "PASS")
+        self.assertNotEqual(report["status"], "REVIEW_READY")
+
+    def test_changed_learning_plan_invalidates_learner_evidence(self):
+        path = Path(self.m["artifacts"]["learning_plan"]["path"])
+        path.write_text('{"changed": true}')
+        report = self.run_release()
+        self.assertEqual(report["checks"]["learner"]["status"], "STALE")
+        self.assertNotEqual(report["status"], "REVIEW_READY")
+
     def test_review_ready_does_not_require_or_create_user_acceptance(self):
         r = self.run_release()
         self.assertTrue(r["ready_for_target"])

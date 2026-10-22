@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "language",
+        "goals",
+        "paired_units"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "learning-closure-plan/1"
+        },
+        "language": {
+          "enum": [
+            "zh-CN",
+            "en-US"
+          ]
+        },
+        "goals": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "question",
+              "kind",
+              "introduced_at",
+              "resolution_by",
+              "importance_reason"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "question": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "kind": {
+                "enum": [
+                  "mechanism",
+                  "clinical_manifestation",
+                  "preserved_function",
+                  "application",
+                  "out_of_scope"
+                ]
+              },
+              "introduced_at": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "resolution_by": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "importance_reason": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "paired_units": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "paragraph_ids",
+              "reason"
+            ],
+            "properties": {
+              "paragraph_ids": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                }
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract_version",
+        "language",
+        "draft_language_sha256",
+        "plan_sha256",
+        "answers",
+        "unplanned_gaps",
+        "required_edits",
+        "optional_notes",
+        "verdict"
+      ],
+      "properties": {
+        "contract_version": {
+          "const": "learning-closure-review/1"
+        },
+        "language": {
+          "enum": [
+            "zh-CN",
+            "en-US"
+          ]
+        },
+        "draft_language_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "plan_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "answers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "goal_id",
+              "status",
+              "answer",
+              "source_refs",
+              "missing_link",
+              "reason"
+            ],
+            "properties": {
+              "goal_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "status": {
+                "enum": [
+                  "answered",
+                  "missing",
+                  "unclear",
+                  "out_of_scope"
+                ]
+              },
+              "answer": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "source_refs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "paragraph_id",
+                    "quote"
+                  ],
+                  "properties": {
+                    "paragraph_id": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    "quote": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    }
+                  }
+                }
+              },
+              "missing_link": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "unplanned_gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "paragraph_id",
+              "question",
+              "missing_link"
+            ],
+            "properties": {
+              "paragraph_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "question": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "missing_link": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        "required_edits": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "optional_notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "verdict": {
+          "enum": [
+            "pass",
+            "revise",
+            "uncertain"
+          ]
+        }
+      }
+    }
+  }
+}

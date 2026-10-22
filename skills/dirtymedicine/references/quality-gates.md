@@ -10,7 +10,7 @@
    - 明确状态语义界限：REVIEW_READY 仅表示送审材料与前置工程流水线已就绪，绝对不代表用户接受（user_accepted），更不代表已获准发布（published）。
 2. **三级目标路由（Targets）与 Policy 绑定**：
    质检目标必须严格按照 Policy JSON 实际配置动态装配检查项，严禁执行器私自发明或硬编码：
-   - script-review（文稿阶段）：必须全量通过 author, medical, learner, comparison, prefix, calibration, source_audit 共 7 项检查。
+   - script-review（文稿阶段）：必须全量通过 author, medical, learner, comparison, prefix, calibration, source_audit 共 7 项检查。其中 learner 门禁必须消费当前讲稿与问题计划对应的闭环核验凭证（scripts/check_learning_closure.py 输出的 closure-check.json，详见 [learner-review.md](learner-review.md) 与 [learning-closure.md](learning-closure.md)），无需新设独立 release 层级；文稿阶段全通仅送用户审稿，严禁擅自启动配音与视频渲染。
    - private-video-review（成片内审阶段）：在文稿阶段基础上，增加 voice_recipe, audio_engineering, audio_review, captions, visual_engineering, video_engineering, video_review，完成工程指标与多模态双重闭环。
    - publish（正式发布阶段）：在成片内审基础上补充 publication_metadata 检查（涵盖课程编号、品牌视觉、双语分发元数据）。
 3. **状态机定义与唯一放行标准**：
@@ -66,5 +66,5 @@
 2. **模型 IO 与重试底线**：
    - 模型调用仅允许在遭遇网络传输失败（transport error）或输出格式严重违背 Schema 时，执行有限次数的同请求重试。
    - 当模型返回有效的语义审查修改意见（verdict: revise）时，**绝对禁止通过重新抽样重试来‘刷出 PASS’**。
-   - 格式问题先修复模型输出格式，或按同一冻结请求有限重试；仅在证实消费者有缺陷时修复消费者并重跑，不得削弱合同以迎合错误输出；真实内容问题必须交回 agy 进行最小范围精准改稿，随后重跑受影响的 DAG 节点，严禁为了迁就审核器缺陷而误改优质讲稿。
+   - 格式问题先修复模型输出格式，或按同一冻结请求有限重试；仅在证实消费者有缺陷时修复消费者并重跑，不得削弱合同以迎合错误输出；真实内容问题必须交回 agy 进行最小范围精准改稿，随后重跑受影响的 DAG 节点及成对问答单元（paired_units）和受影响邻段联动复验，严禁仅改单句而遗留跨段因果脱节，严禁为了迁就审核器缺陷而误改优质讲稿。
    - 非核心措辞偏好统一归入 optional_notes，宽容对待，不强求每个学科公理都在开场重复定义或机械塞满。
